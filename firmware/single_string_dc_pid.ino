@@ -5,30 +5,6 @@
  * DC motor with an encoder and a PID controller for precise positioning.
  *********************************************************************/
 
- /*********************************************************************
- *  FFT Guitar Tuner – Arduino UNO R4 WiFi  +  L298N DC-gear-motor
- *  ---------------------------------------------------------------
- *  • 4 kHz, 1 024-point FFT  → 3.906 Hz bins (+ quadratic interp)
- *  • RMS, SNR, strum gate, 3-frame stability
- *  • Hold filter: pitch must stay within ±10 Hz for ≥0.4 s
- *  • PID → DC-motor bursts (direction via IN1/IN2, speed via PWM on pin 9)
- *********************************************************************/
-
-
-/*---------------------------------------------------------------
-   Standard guitar – open-string reference frequencies
-   (A = 440 Hz, equal tempered)
-
-
-     6th • Low-E  =  82.41 Hz (E2)
-     5th • A      = 110.00 Hz (A2)
-     4th • D      = 146.83 Hz (D3)
-     3rd • G      = 196.00 Hz (G3)
-     2nd • B      = 246.94 Hz (B3)
-     1st • High-E = 329.63 Hz (E4)
-  ---------------------------------------------------------------*/
-
-
 #include <Arduino.h>
 #include <arduinoFFT.h>
 #include <algorithm>                 // std::nth_element

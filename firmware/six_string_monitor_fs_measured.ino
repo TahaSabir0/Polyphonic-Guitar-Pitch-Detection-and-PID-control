@@ -5,17 +5,6 @@
  * one is played, and measure its fundamental frequency using FFT.
  *********************************************************************/
 
- /*********************************************************************
- *  Six-String FFT Frequency Monitor  –  self-measured Fs
- *  (UNO R4 WiFi, 1 024-point FFT @ ~4 kHz)
- *  ---------------------------------------------------------------
- *  • Computes the true sampling rate every frame, so pitch stays
- *    correct whether USB-PLL or the freerunning HOCO clock is active.
- *  • Per-string ±band, minSNR, and minMag are now your tuned numbers.
- *********************************************************************/
-
-
-
 
 #include <Arduino.h>
 #include <arduinoFFT.h>

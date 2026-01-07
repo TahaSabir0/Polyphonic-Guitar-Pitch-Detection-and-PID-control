@@ -5,18 +5,6 @@
  * stepper motor and a PID controller for precise positioning.
  *********************************************************************/
 
-
- /*********************************************************************
- *  FFT Guitar Tuner – Arduino UNO R4 WiFi
- *  ---------------------------------------------------------------
- *  • 4 kHz, 1 024-point FFT  →  3.906 Hz bins + quadratic interp
- *  • RMS, SNR, strum-gate, 3-frame stability
- *  • 0.6 s “hold” filter: pitch must stay within ±10 Hz for ≥600 ms
- *  • Search band 75 – 400 Hz to avoid octave picks
- *  • PID → micro-steps; each correction lasts ~1 s
- *********************************************************************/
-
-
 #include <Arduino.h>
 #include <arduinoFFT.h>
 #include <algorithm>                 // std::nth_element
