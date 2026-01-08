@@ -60,7 +60,7 @@ The audio detection system is the foundation of the project. It captures string 
 
 After weeks of debugging a signal degradation issue, I discovered that piezoelectric microphones require a DC bias path. **Add a 1 MΩ resistor** between the non-inverting input (+) of the op-amp and Arduino ground. Without this, the piezo element acts like a capacitor and slowly charges, causing the signal to fade.
 
-**Circuit diagram:** [hardware/system_wiring/sound_amplification circuit_by_amanda_ghassaei.png]
+**Circuit diagram:** [hardware/system_wiring/sound_amplification circuit_by_amanda_ghassaei.png](hardware/system_wiring/sound_amplification_circuit_by_amanda_ghassaei.png)
 
 **Detailed breakdown:** [Week 3 Blog Post](https://dtsf.sites.gettysburg.edu/dtsf2025/uncategorized/week-3-algorithmic-pivots-torque-troubles-and-a-breakthrough/)
 
