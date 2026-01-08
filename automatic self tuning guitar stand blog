@@ -1,0 +1,372 @@
+Skip to content
+Digital Technology Summer Fellows 2025
+
+What can we build?
+
+Search for
+Search
+ Search
+Sample Page
+Author: Taha Sabir
+Week 8: The Final Push—Integration, Breakthroughs, and a Finished Prototype!
+by Taha Sabir  August 2, 2025  3:27 am  Leave a commenton Week 8: The Final Push—Integration, Breakthroughs, and a Finished Prototype!  Uncategorized 
+Hello everyone, and welcome to my eighth and final blog post for the Digital Technology Summer Fellowship (DTSF) program. With our final presentation scheduled for Thursday morning, the pressure was on to transform my collection of working subsystems into a single, polished, and fully functional prototype by Wednesday afternoon. This week was a whirlwind of final designs, elegant solutions, and last-minute problem-solving.
+
+Solving the Final Power and Mounting Puzzle
+The final week began with the challenge of creating a stable stand for the 3-motor tuning module. My first attempt was to design and print an attachment for a camera tripod. While the part fit perfectly, the tripod itself didn’t allow for the precise alignment needed.
+
+I briefly experimented with a new tuning peg attachment design that wouldn’t require me to hold it, but it didn’t grip as well as my previous version. Under the time pressure, I reverted to the proven design.
+
+
+(The old attachments in the front and the new defective attachment in the back)
+
+The main task, however, was to finally solve the power issue and isolate the strummer’s NEMA 17 motor from the sensitive audio circuit. My initial plan involved a dedicated driver for the NEMA 17 powered by a 12V supply, but the wiring wasn’t working as expected.
+
+Then, I stumbled upon a breakthrough. I realized that the L298N motor drivers, which run the DC tuning motors, have a built-in 5V output regulator. This was the elegant solution I needed. I could power the entire system from a single 12V source. The 12V supply would feed the two L298N drivers, and in turn, their 5V outputs could power not only the Arduino but also the 5V logic for the A4988 stepper motor driver. This solved the electrical noise problem by isolating the motor power from the logic power and massively simplified the entire system, requiring just one plug to power everything.
+
+Final Assembly and Cabling
+With the power architecture solved, my main goal for Tuesday was the final cabling and assembly. Before locking everything down, I made one last mechanical tweak. I noticed the strumming slider’s height was affecting the quality of the strum and, consequently, the FFT’s accuracy. A simple fix—increasing the strummer’s height for a gentler string attack—made a significant difference.
+
+
+After hours of careful cabling and testing, the final modular components of the system were complete:
+
+The Audio Input and Amplification Circuit:
+
+The A4988 Driver for the NEMA 17 Strummer:
+
+The Modified Strumming Slider:
+
+The Two L298N DC Motor Drivers:
+
+The 3-Motor Tuning Module:
+
+The Final Demo and a Custom Enclosure
+Wednesday was all about the final push. I spent the day making the last crucial software adjustments, fine-tuning variables like the frequency bin sizes, the signal detection duration after a strum, the amount of data collected, and the maximum motor turn magnitude. After this final calibration, the system worked flawlessly. I was thrilled to be able to film a final demonstration of the complete, integrated automatic guitar tuner in action.
+
+With a working device, the last task was to give it a home. I spent Wednesday night designing and 3D printing a custom enclosure to bring all the separate electronic modules together into one nifty little box. I designed it with carefully measured, fitted holes for each breadboard and component, using double-sided tape to secure everything neatly inside.
+
+
+Final Reflections on the DTSF Journey
+This Digital Technology Summer Fellowship (DTSF) has been an incredible journey. It has taught me so much about technology, software, and hardware, but most importantly, it has taught me about resilience, ambition, and the value of hard work.
+
+Saying that I had very little experience with hardware before starting this project would be an understatement. The learning curve was steep, and there were many moments where challenges seemed insurmountable. However, with the invaluable guidance and unwavering support of Professor Eric Remy and Joshua Wagner, I was able to power through every difficulty.
+
+This internship has truly changed me in many ways. It has ignited a passion for building and creating, and it has made me eager to take on many more projects in the future. Thank you to everyone who has followed along with my progress!
+
+Week 7: The Final Boss—Chasing Ghosts in the Audio Signal
+by Taha Sabir  July 15, 2025  2:21 am  Leave a commenton Week 7: The Final Boss—Chasing Ghosts in the Audio Signal  Uncategorized 
+Hey everyone, Taha Sabir here with my Week 7 update for the DTSF program. If last week was a deep dive, this week felt like a full-on expedition into the most challenging and elusive problems of the entire project. My focus was on integrating all the subsystems—the tuner, the new motor, and the automatic strummer—but I spent most of my time hunting down a mysterious and persistent issue with the audio signal.
+
+Building the Automatic Strummer
+I kicked off the week by finishing the automatic strumming mechanism. Using the linear slide I took from an old 3D printer, I was able to get the NEMA 17 motor to drive a slider back and forth.
+
+After more than 4 iterations of the same 3d design, I was finally able to attach a pick to the automatic slider to strum the guitar.
+
+My other task was to get the multi-string pitch detection code working reliably on the Arduino Mega. The Mega’s memory constraints had forced me to use a smaller FFT sample size (512 instead of 1024), which made the previous fine-tuning obsolete. After carefully recalibrating the detection parameters for each string, I was able to get the FFT working well on the Mega.
+
+A Haunting in the Circuit
+On Tuesday, with the strummer built and the code adapted, I began integrating all the parts. Almost immediately, I faced a baffling problem: the FFT was detecting frequencies constantly, even when no strings were played. Examining the raw signal from my amplifier circuit revealed a strange, persistent wave of noise that was independent of the microphone’s input.
+
+This began a day-long diagnostic nightmare. I replaced the op-amp, and it worked… for five minutes. I swapped the Arduino Mega for the R4, and it worked. I swapped back to the Mega, and it still worked. For a while, the problem vanished without a clear reason, leaving me with a functional but untrustworthy system. This volatility in the audio signal became the central, time-consuming challenge of the week.
+
+Unraveling the Harmonics Problem
+My goal for Wednesday was to get all the systems working together. However, when I tried, the tuning was wildly inaccurate. I finally understood a core problem with polyphonic tuning: sympathetic resonance. When one string is plucked, its vibrations cause other strings to vibrate at corresponding harmonic frequencies. For example, the 3rd harmonic of the A₂ string (110 Hz) is almost exactly the fundamental frequency of the high E₄ string (330 Hz). When all strings are strummed at once, these clashing harmonics completely overwhelm the lighter strings, leading to incorrect frequency readings.
+
+Heavy string	Harmonic	Lands near
+E₂ 82.4 Hz	3× ≈ 247 Hz	B₃ 246.9 Hz
+A₂ 110 Hz	3× ≈ 330 Hz	E₄ 329.6 Hz
+D₃ 147 Hz	2× ≈ 294 Hz	just inside E₄ band
+After failed attempts to filter this out or use a different algorithm (like YIN), I decided the best path forward was to go back to the Arduino R4. Its ability to handle a larger 1024-sample FFT provides a higher frequency resolution, which is critical for distinguishing these closely-packed fundamentals and harmonics.
+
+Solving the Strummer & The Ghost in the Machine
+On Thursday, I realized that even on the R4, the pitch detection was inconsistent when using the automatic strummer. I realized the stiff 3D-printed pick was “attacking” the strings too harshly, creating excessive noise. The solution was surprisingly simple and effective: I replaced the plastic pick with a small piece of cardboard, which produces a much cleaner, more natural strum perfect for pitch detection.
+
+With a consistent input, I finalized the core control loop algorithm:
+
+Strum the strings back and forth.
+Wait 0.2 seconds for the initial attack to settle.
+Collect FFT data for 0.8 seconds.
+Calculate the median frequency for each string’s data band.
+Formulate a PID response and send it to the correct motors.
+
+
+Just as things seemed to be working, the audio signal instability returned with a vengeance. After hours of troubleshooting on Friday—swapping boards, replacing the amp again—I thought I had found the culprit: a loose 5V connection in the power strip. But the victory was short-lived.
+
+The Real Culprit Revealed
+The problem persisted. I spent another four hours on Sunday rebuilding the entire audio circuit from scratch, replacing every single component and wire. Finally, I discovered the true source of the noise.
+
+My project uses the Arduino’s 5V output to power both the audio circuit and the NEMA 17 motor for the strummer, distributed via a common power rail on the breadboard. It turns out that the NEMA 17 motor was introducing electrical noise back into the power rail, creating micro-spikes that were being picked up by the highly sensitive amplifier circuit. This also explained why the circuit sometimes worked fine on the Mega—when testing, I had been plugging the amp directly into the Mega’s 5V pin, isolating it from the motor’s noise. The solution is to give the audio circuit its own, isolated power supply, separate from the noisy motor.
+To demonstrate this, Here’s a video of the audio input when the NEMA 17’s power supply is plugged into the circuit and when it’s removed. In the first case we can clearly see sudden spikes emerging in the otherwise relatively stable signal and after unplugging the power sources, we can see the audio stabilizing again, varying only between 503 and 510.
+
+This week was a bittersweet battle. The immense time and energy spent debugging the audio signal means I likely won’t have time to build the second 3-motor tuning module. However, identifying and finally understanding this deep-seated electrical noise issue is a critical breakthrough. With this knowledge, my focus for the final week will be on creating a stable, integrated system and getting the full 3-string tuner working cohesively.
+
+Week 6: A Tale of Two Clocks, New Hardware, and Multi-String Success
+by Taha Sabir  June 29, 2025  7:28 am  Leave a commenton Week 6: A Tale of Two Clocks, New Hardware, and Multi-String Success  Uncategorized 
+Hello again! Taha Sabir here with my Week 6 update on the Automatic Guitar Tuning Stand for the DTSF program. This week felt like a true deep dive into the nitty-gritty of embedded systems, as I tackled everything from frequency drift and hardware failures to designing the final mechanical assemblies and moving to a more powerful microcontroller.
+
+Finalizing the 3-Motor Tuning Module
+The week began with finalizing the design of the 3-motor tuning module. To avoid printing the entire large enclosure just for a test fit, I printed a partial piece to check the alignment of the motors with the guitar’s tuning pegs, which thankfully lined up perfectly.
+
+
+This gave me the confidence to design the final version, complete with a backplate to ensure the motors don’t slide backward under pressure, while leaving space for cable management. I also spent time creating proper wiring harnesses for all the motors.
+
+
+The first full print of the updated enclosure failed partway through due to a 3D printing issue, but enough of it was completed to confirm that the measurements were precise.
+
+
+I realized a slightly looser tolerance for the motor holes would actually improve alignment, so I started a new print with that adjustment.
+
+While that was printing, I needed a way to control all three motors. The L298N motor driver I have can only control two motors, so I “borrowed” another L298N driver from some mini cars in the lab to get the third motor running. After wiring everything up, a simple test confirmed all three motors were operational. I also calibrated the PWM values to achieve the right turning speed.
+
+Refining the Multi-String Pitch Detection
+With the hardware coming together, I merged the polyphonic FFT detection code with the single-string PID control logic. The initial test showed that while most strings were detected, the D string was consistently being missed. I implemented two solutions:
+
+Individual Thresholds: I lowered the specific volume threshold required to register a “detected” sound just for the D string.
+Input Buffer System: I created a more robust detection system. The code now continuously gathers FFT data until it receives a signal above the specific threshold for all three strings for at least 0.3 seconds. Only then does the buffer release the pitch data and trigger the motors. This prevents the system from acting on incomplete or noisy data.
+The Case of the Drifting Frequencies
+Wednesday was primarily focused on testing. I assembled the final sealed motor box and immediately ran into issues.
+
+
+First, the signal from the op-amp was erratic; I quickly diagnosed another fried chip and replaced it. The larger issue was that the pitch detection was now highly inconsistent. I realized that testing with the guitar lying horizontally on a table was dampening the vibrations too much for the contact mic to work effectively—a key insight for the final stand design.
+
+Even when holding the guitar, the frequency readings were off. After a full day of unsuccessful debugging, I dedicated Thursday to solving this inconsistency. I noticed that while the frequency was accurate when the Arduino was first powered, the readings would drift upward by about 5 Hz after a short time, especially when disconnected from the laptop’s USB.
+
+After extensive investigation, I uncovered a fascinating and subtle hardware issue within the Arduino R4 WiFi board itself:
+
+The board uses two different internal clock sources. A highly accurate one (USB-PLL) when actively connected to a computer’s USB port, and a less accurate, temperature-sensitive one (HOCO) when running on its own or when the USB connection is idle.
+My board’s HOCO clock was running about 2.5% too fast. Since my FFT code assumed a perfect 4000 Hz sampling rate, this faster clock caused all calculated frequencies to be reported 2.5% too high.
+This tiny, hidden hardware discrepancy was the root cause of my biggest software headache! With this knowledge, I was able to compensate for the clock difference and finally achieve stable, accurate frequency detection under all conditions. I then fine-tuned the parameters (bandwidth, SNR, magnitude thresholds) for all six strings.
+
+/* Finalized Tuning Parameters */
+StringTun STR[6] = {
+/* name   Hz       band  SNR    mag */
+  {"E2",  82.41f,  12,   5.0f,  600},
+  {"A2", 110.00f,  12,   5.0f,  800},
+  {"D3", 146.83f,  14,   3.5f,  300},
+  {"G3", 196.00f,  12,   5.0f,  500},
+  {"B3", 246.94f,  12,   3.0f,  200},
+  {"E4", 329.63f,  14,   2.5f,  120}
+};
+Pivoting to Final Hardware and Next Steps
+On Friday, with the software now robust, I revisited the mechanical attachment. I tested the universal shaft idea again, and while it works, the tight clearance between tuning pegs and the cost remain concerns.
+
+
+In preparation for the full 6-motor system, I switched the entire circuit over to an Arduino Mega.. This immediately presented a new challenge: the Mega has different memory constraints, and my existing code struggled to run. I had to reduce the FFT sample size to 512, which compromised the detection accuracy for some strings, particularly the low A string.
+
+I also began working on the automatic strumming mechanism, salvaging a linear slide from an old 3D printer. After some tinkering, I successfully extracted the mechanism I need and am ready to start integrating it.
+
+This week was a testament to the fact that sometimes the smallest, most hidden problems can take the most energy to solve. However, with a now-stable pitch detection algorithm and all the major hardware components on hand, the path is clear. Next week’s primary focus will be optimizing the polyphonic pitch detection code to run smoothly on the Arduino Mega and beginning to bring all the sub-systems together to build the final stand.
+
+Week 5: New Motors, Multi-String Logic, and Mechanical Design
+by Taha Sabir  June 23, 2025  9:26 am  Leave a commenton Week 5: New Motors, Multi-String Logic, and Mechanical Design  Uncategorized 
+Hi everyone! Taha Sabir here with the Week 5 update on my Automatic Guitar Tuning Stand project for the DTSF program. After getting a single-string prototype working last week, this week was all about integrating the new, more powerful DC motor and expanding the software to handle multiple strings, which pushed me to start designing the final mechanical enclosure.
+
+Integrating the New High-Torque DC Motor
+The week began with the arrival of the new Greartisan DC 12V 5 RPM high-torque motor, which was selected based on last week’s torque measurements. I spent Monday wiring it up and writing a simple script to confirm it was operational.
+
+
+With the motor working, the next challenge was to design a robust and reusable way to connect it to the guitar’s tuning peg. I wanted to avoid permanently epoxying the motor shaft to an attachment. So, on Tuesday, I designed a new 3D-printed attachment that securely connects the motor’s drive shaft to the tuning peg while being completely removable. This is a key step towards a user-friendly final product.
+
+
+Major Software and Hardware Breakthrough
+Wednesday was a big day for the project! First, I tested the new DC motor with the 3D-printed attachment, and it successfully turned the tuning peg with more than enough torque. With the hardware validated, I adapted the PID control code from the old stepper motor setup to work with the new DC motor. This new integrated system works really well!
+
+The only downside was that the 5 RPM motor was slower than desired for quick tuning.
+
+The other major achievement was expanding the software to handle multi-string pitch detection. Instead of just listening for one frequency, I implemented a new approach using the FFT data. The code now slices the FFT output into six non-overlapping frequency windows (each about ±12 Hz wide), centered around the known fundamental frequencies of each of the six open guitar strings. This allows the software to pick the peak frequency within each specific band, effectively identifying the pitch of all six strings from a single strum. I’m happy to report that this multi-string detection logic is fully functional!
+
+Conceptualizing the Multi-Motor Enclosure
+On Thursday, with the software now capable of handling multiple strings, I started designing the physical enclosure for the first tuning module, which will hold three motors for one side of the guitar headstock. The DC motors have an offset shaft, which is actually beneficial as it allows the motors to be packed closely together while aligning the shafts correctly with the tuning pegs.
+
+However, since the motors are cylindrical, they would spin inside a simple round compartment. To solve this, and to avoid permanently gluing the motors, I designed small, 3D-printed rectangular “side attachments” that can be epoxied to the motors. These flat sides will prevent the motors from rotating inside the enclosure, ensuring all the torque is transferred to the tuning pegs while keeping the motors reusable.
+
+
+I also designed the first version of the box that will hold these three motors in their correct positions.
+
+
+Realizing the 5 RPM motor was too slow, I also ordered three new 20 RPM motors for this first tuning module prototype.
+
+Refining the Design and Finalizing Prototypes
+On Friday, upon reviewing the enclosure design, I realized I could improve the orientation of the middle motor’s side attachments for a better fit. I spent the day redesigning the enclosure to incorporate this change and fix a few other minor issues.
+
+
+On Saturday, I printed all the components and successfully epoxied the side attachments to the three DC motors.
+
+
+However, after a test fit, I discovered that the holes in the enclosure for the motors were slightly too wide. This caused a minor misalignment of the drive shafts. Correcting this design and achieving a fully functional, three-string tuning module will be the primary focus for next week.
+
+This week felt like a huge leap forward. I now have a working single-string prototype with the final motor type, and the core software logic for tuning all six strings is complete. The project is now moving heavily into the final mechanical design and assembly phase, and I’m excited to build the first multi-string tuning module next week.
+
+Week 4: PID Control, Debugging Marathons, and a Working Prototype!
+by Taha Sabir  June 17, 2025  2:27 am  Leave a commenton Week 4: PID Control, Debugging Marathons, and a Working Prototype!  Uncategorized 
+Hello again! Taha Sabir here with my Week 4 update on the Automatic Guitar Tuning Stand project for the DTSF program. This week was all about integration—bringing the software control systems and hardware components together. This process led to a series of challenging debugging sessions but ultimately culminated in a huge milestone: a functioning single-string prototype.
+
+Implementing the PID Control Loop
+With the FFT pitch detection algorithm working from last week, I started Monday by coding the core of the automatic tuning logic: a PID (Proportional-Integral-Derivative) control system. This controller is what allows the tuner to intelligently adjust the motor’s position based on how far off the string’s current pitch is from its target. it utilizes the following formula to find the most optimal way of tuning the guitar peg
+
+
+I also made a key refinement to the FFT algorithm by adding a high-pass filter. I noticed that when tuned down, the high E string’s harmonics would sometimes register more strongly than its fundamental frequency, confusing the pitch detection. This filter helps isolate the correct frequency for a more accurate reading. After getting the initial prototype code to work, the project claimed its first victim—the high E string popped under the strain of repeated testing!
+
+
+The Ongoing Search for Torque
+On thesday, while testing the prototype, it became clear that the harmonics of the low E string were also creating some issues. I started the day by trying to use the professional torque tester we had received, but unfortunately, it wasn’t working correctly. Not wanting to be blocked, I created a DIY torque tester using some basic lab equipment.
+
+
+
+This resourceful solution gave me a crucial piece of data: it takes approximately 0.3 N·m of torque to reliably turn the tuning peg on the heaviest string. This explained why even the NEMA 17 didn’t work. Our 0.3N.m estimation is representative of the dynamic torque a motor would need to have to turn the heaviest tuning peg in the guitar. Considering the NEMA 17’s holding torque is 0.4N.m, the dynamic torque would be approximately 40% to 60% lower than the holding torque which explains why the NEMA 17 wasn’t strong enough. Based on this new data, we made the decision to pivot from stepper motors entirely and purchased a Greartisan DC 12V 5 RPM 1.47N.m dynamic torque, which should provide more than enough power for the final design.
+
+
+The Debugging Gauntlet
+With the single-string prototype running, a number of smaller issues emerged that required a multi-day debugging marathon. I tackled them one by one:
+
+Problem: High E String Harmonics. Even with the initial filter, noise was an issue.
+Solution: I implemented a more aggressive high-pass filter set at 400 Hz. This effectively cuts out the lower-octave ringing that was being incorrectly detected.
+Problem: Oversensitivity. The piezo microphone was so sensitive that any slight tap on the guitar body would be registered as a note, causing the motor to react incorrectly. Furthermore, the low E string had a quiet, persistent ringing that would sometimes trigger the system.
+Solution: I implemented two software fixes: a 0.6-second delay after a note is detected before the system tries to listen again, and a volume threshold that ignores any sounds below a certain loudness. This combination prevents false triggers from taps and ambient vibrations.
+Problem: Motor Speed. The initial motor movement was too fast and abrupt for fine-tuning.
+Solution: I placed the motor’s rotation commands inside a loop that precisely controls its speed, resulting in a much smoother and more controllable turning motion.
+Problem: Unstable Signal. At one point, the audio signal became erratic for no apparent reason.
+Solution: After extensive testing, I discovered the issue was hardware-related—the op-amp on my breadboard had fried. After replacing the chip, the signal returned to its stable, amplified state.
+Success and Next Steps
+After the intense debugging sessions, I finally got the single-string prototype to work reliably on friday! It can now successfully listen to a string and turn the motor to bring it into tune.
+
+On the same day, the new Greartisan DC motor arrived. My focus now shifts to adapting the working code from the stepper motor prototype to this new, more powerful DC motor. This will be the main goal for the upcoming week as I move closer to the final hardware configuration.
+
+This week felt like a trial by fire, but it ended on a high note. Having a working proof-of-concept is incredibly motivating. The path is now clear to integrate the final DC motor and begin designing the multi-string version of the tuner.
+
+Week 3: Algorithmic Pivots, Torque Troubles, and a Breakthrough
+by Taha Sabir  June 13, 2025  8:59 am  Leave a commenton Week 3: Algorithmic Pivots, Torque Troubles, and a Breakthrough  Uncategorized 
+Hello again! Taha Sabir here, continuing my work on the Automatic Guitar Tuning Stand as part of the DTSF program. This week was a rollercoaster of deep dives into software algorithms, confronting mechanical limitations, and finally solving a persistent electrical issue. It was a week defined by problem-solving and making key decisions about the project’s direction.
+
+Breakthrough on the Audio Circuit & A Software Pivot
+The week started with a major breakthrough! I was able to solve the lingering issue of the audio signal’s amplitude declining over time. After some investigation, I learned that the issue was specific to using a piezoelectric contact microphone. Essentially, the piezo element acts like a capacitor. Without a proper DC path for the tiny amount of bias current that the op-amp needs, this “capacitor” would slowly charge up until the op-amp’s input saturated, causing the signal to fade to its 2.5V center point. The simple and effective solution was to add a 1 MΩ resistor from the non-inverting input (+) of the op-amp to the Arduino’s ground, which provides the necessary path for this current.
+
+
+
+With the audio input now stable, I turned my attention to the pitch detection software. My initial plan was to adapt a YIN autocorrelation algorithm from the Boestad and Rudberg paper, “Piezoelectric Guitar Tuner.” However, after attempting to implement it on my Arduino R4, I ran into difficulties and was unsuccessful.
+
+I decided to pivot my approach entirely and implement a Fast Fourier Transform (FFT) algorithm instead. This took the entire day, as I had to navigate hardware accessibility differences between the Arduino Uno R3 (often used in examples) and my R4. I’m happy to report that the effort paid off—the final FFT algorithm for pitch detection works great!
+
+Mechanical Realities: The Search for Torque
+On Tuesday, considering I had a working pitch detection algorithm and a stable audio circuit, I assembled the integrated prototype.
+
+
+This integration quickly revealed a new mechanical roadblock. I discovered that even the upgraded NEMA 17 motor, with its 0.4 N·m of torque, was still not powerful enough to reliably turn the tuning pegs under full string tension.
+
+This made it clear that simply estimating the required motor power wasn’t a viable strategy. Instead of continuing to guess and order progressively larger motors, we decided to take a more data-driven approach to solve this problem once and for all.
+
+New Tools: Torque Testing and the MATLAB Experience
+To get precise data, we decided to purchase a torque tester on Wednesday. This will allow us to measure the exact force required to turn a tuning peg, enabling an informed decision on the final motor selection.
+
+
+On another positive note, I was finally able to get MATLAB working. The reason for the delay since the start of the project was external—the provider was the victim of a ransomware attack that had only recently been resolved. I began connecting my Arduino to the software to get a feel for it and learn its capabilities for data visualization and analysis.
+
+
+Strategic Decisions for Development
+While exploring MATLAB on Friday, I successfully got a basic analog input from the Arduino to register in the software. However, I made a strategic decision to focus my development efforts within the Arduino IDE for the time being. The primary reason is that the most complex software component—the FFT pitch detection algorithm—is already fully implemented and working well directly on the Arduino. Moving everything to MATLAB would mean rebuilding that core functionality.
+
+This week was a perfect example of the engineering process: a problem from last week was solved (the audio circuit), which immediately revealed a new one (motor torque). I successfully pivoted my software strategy from YIN to FFT and now have a clear, data-driven plan to select the final motor. I’m looking forward to getting concrete torque measurements and moving the project closer to its final form.
+
+Week 2: Motor Upgrades, Circuit Prototyping, and Audio Puzzles
+by Taha Sabir  June 3, 2025  6:16 am  Leave a commenton Week 2: Motor Upgrades, Circuit Prototyping, and Audio Puzzles  Uncategorized 
+This week in the DTSF program, my work on the Automatic Guitar Tuning Stand focused on refining the mechanical drive system and making significant strides in developing the audio input circuitry. Each step brought new learnings and the occasional challenge to navigate.
+
+Motor Torque and Audio Signal Research
+The week began with a practical assessment of the motor’s capability. After further torque testing, it became evident that the NEMA 11 motor, while advantageously compact, did not consistently provide the necessary force for reliably turning the tuning pegs. Consequently, I shifted focus to the NEMA 17 stepper motor. I 3D printed a new mount and conducted tests, which showed that the NEMA 17 performs well and delivers sufficient torque for the task. This was a positive development for the mechanical drive aspect of the tuner.
+
+
+With the motor selection addressed, my attention turned to the audio input system. I had just received the Korg CM200BK contact microphone as suggested by Antonio Hinojosa Cabrera in his paper “Automatic guitar tuner.” Bachelor’s thesis, Universitat Politècnica de Catalunya, 2020. This particular microphone was chosen due to its unique ability to only detect the vibrations coming from the guitar’s body, essentially eliminating most of the outside noise directly from the audio input stage.
+
+
+I then began researching suitable electrical circuits to effectively amplify the signal from the Korg microphone. The goal is to capture a clean and robust signal, which is crucial for accurate frequency detection by the microcontroller.
+
+
+
+
+Initial Microphone Signal Detection
+On Wednesday, I made initial progress on the audio front by assembling and testing a very basic circuit for the Korg microphone. At this stage, the operational amplifiers (op-amps) required for proper signal amplification had not yet arrived. The purpose of this simple setup was primarily to confirm that the Arduino could detect a signal from the microphone.
+
+
+When a guitar string was strummed, the Arduino’s serial monitor displayed a noticeable change in the printed values, confirming that the microphone was capturing the instrument’s vibrations. However, as expected, without amplification and proper signal conditioning, the raw signal was not yet suitable for extracting discernible frequencies.
+
+Audio Amplification Circuit Design
+Following further research into preamplifier circuit designs, I finally decided to go with the circuit suggested by amanda ghassaei in her article https://www.instructables.com/Arduino-Audio-Input/.
+
+
+This circuit is designed to take the raw signal from the Korg microphone, amplify it, and bias it correctly for the Arduino’s analog-to-digital converter. I began constructing the circuit on a breadboard, placing all the passive components. The completion of the circuit awaited the arrival of the op-amp ICs.
+
+
+Amplifier Assembly and Troubleshooting
+On friday, I finally received the TL072CN operational amplifiers, allowing me to complete the assembly of the audio amplification circuit as designed.
+
+Initial tests were promising, as the circuit successfully amplified the signal from the Korg microphone to a more usable level.
+
+While the amplifier circuit initially performed well, a persistent issue emerged during longer tests where the signal’s amplitude would gradually fade after a strong start. I began the troubleshooting process, looking into connections, component specifications, and possible explanations like capacitor charging dynamics or impedance variations, but the problem remained unsolved by the end of the week. This sensitivity issue will be a priority to address next week.
+
+Overall, Week 2 saw important progress in both the mechanical drive, with the successful integration of the NEMA 17 motor, and the electrical system, with the assembly of the initial audio amplifier. The sensitivity issue with the audio circuit presents the next immediate challenge, but overcoming such obstacles is an integral part of the development process.
+
+Week 1: Project Foundations for a Self-Tuning Guitar Stand:
+by Taha Sabir  May 25, 2025  9:19 pm  Leave a commenton Week 1: Project Foundations for a Self-Tuning Guitar Stand:  Uncategorized 
+Hey everyone! I’m Taha Sabir, a rising junior here at Gettysburg College, double majoring in Computer Science and Mathematics. This summer, as part of the DTSF program, I’m working on a project that combines my interests in technology and music: an Automatic Guitar Tuning Stand.
+
+My goal is to design and build a standalone device that can automatically and precisely tune all six strings of a guitar. Imagine a stand you can place your guitar on, and with minimal interaction, the device will listen to each string and adjust the tuning pegs until the guitar is perfectly in tune according to a selected standard or custom tuning. The final product should be efficient, user-friendly, and a practical tool for musicians. To achieve this for all six strings, the physical design I’m envisioning for attaching the tuning mechanisms to the guitar headstock will function somewhat like an adjustable phone holder. It will feature a fixed module housing three tuning motors and a corresponding moving module with the other three motors, connected by a spring-loaded mechanism. The idea is to open the mechanism by pulling the moving part, align the first set of motors with their tuning pegs, and then release the moving part so the spring clamps the second set onto the remaining pegs, engaging all six. I am currently working on a design visual so that this mechanism makes more sense.
+
+This first week focused on team introductions, foundational learning, project planning, and addressing the initial challenges of the project.
+
+Getting Started, Planning, and Arduino Introduction
+The week began with team introductions and a session dedicated to planning the project’s scope and timeline for the upcoming weeks.
+
+
+
+Following that, I focused on understanding the core technology for the project by learning the fundamentals of using an Arduino board, starting with basic operations like controlling LEDs.
+
+A significant portion of the early week was allocated to research. I read the “Robotic Electric Guitar Tuner” paper by Martin Gylling and Ruben Svensson, which provided a relevant overview of a similar project. This led me to research the YIN correlation algorithm for pitch detection, a method they successfully employed.
+
+
+
+Research Deep Dive and Initial Setup
+On Tuesday, I continued my literature review, examining other key research papers relevant to the project. This included a project report by Antonio Hinojosa on an automatic guitar tuner and a conference paper by Sevilla Salcedo et al. on a low-cost automatic stringed instrument tuner.
+
+This research helped clarify two primary methods for extracting frequency from an audio signal:
+
+YIN Autocorrelation: This method operates in the time domain and is noted for its efficiency and low memory usage, making it suitable for microcontrollers like the Arduino Uno, particularly for analyzing single strings (monophonic signals).
+FFT (Fast Fourier Transform): This technique works in the frequency domain and is well-suited for analyzing multiple frequencies simultaneously (polyphonic signals). However, for a board like the Arduino Uno, there are potential challenges regarding memory capacity and processing speed, as noted in the Hinojosa paper.
+With this understanding, I placed orders for necessary equipment. This included a universal shaft for the final tuning peg attachment and a Korg CM200BK clip-on contact microphone. This type of microphone captures frequencies directly from the instrument’s vibrations, which is advantageous for minimizing ambient noise, an advantage noted for contact microphones in the Hinojosa paper. My attempt to install MATLAB this week was unsuccessful as the university’s MATLAB servers were down.
+
+Mechanical Prototyping and Challenges
+Wednesday was dedicated to hands-on work with mechanical components. While continuing to learn about FFT as a pitch detection option, I successfully interfaced both NEMA 17 and NEMA 11 stepper motors with the Arduino.
+
+
+I also tested a universal shaft concept on my personal guitar for attaching to the tuning pegs. This initial test revealed a dimensional incompatibility: the shaft’s diameter matched the distance between the tuning pegs, making it unsuitable for that particular guitar’s headstock.
+
+
+To address the universal shaft issue, I borrowed a different guitar from a friend on Thursday. This guitar’s headstock design is more compatible with the universal shaft idea, and its tuners also require less torque, which will be useful for testing, especially with smaller motors. I then proceeded to 3D model the interface components: the gear to be affixed to the motor shaft and the corresponding guitar peg attachment designed to engage with this gear.
+
+
+
+Bringing 3D Models to Life and Motor Testing
+Friday focused on fabricating the 3D designs. After several iterations, I successfully 3D printed the prototype gear and guitar peg attachment.
+
+
+
+
+With these parts, I began initial torque tests on the NEMA 11 stepper motor, as its smaller form factor is desirable for the final product. These tests yielded mixed results; the motor shows potential, but more thorough testing under realistic load conditions is required.
+
+Sound Sensor Exploration and a Minor Setback
+On Saturday, I shifted focus to the audio input system and began working with the sound sensor. However, progress was interrupted when the Arduino board ceased to function. Troubleshooting the Arduino board will be a priority for the upcoming week.
+
+This first week has been productive, with significant activity in planning, research, and initial prototyping. Despite some minor setbacks, the project is progressing, and I look forward to addressing the next set of challenges.
+
+Search
+Search
+Recent Posts
+Week 8: The Final Push—Integration, Breakthroughs, and a Finished Prototype!
+Week 8 – Reflection: When Hardware Meets Reality
+Week 7 – Building, Breaking, and Finally Kicking
+Week 7: The Final Boss—Chasing Ghosts in the Audio Signal
+Week 8: Reflecting on the Journey – From Concept to Creation
+Recent Comments
+A WordPress Commenter on Hello world!
+© 2026 Digital Technology Summer Fellows 2025  Powered by WordPress  Theme: Gillian
+
+Back to top
