@@ -6,6 +6,10 @@ A standalone robotic system that automatically detects pitch and tunes guitar st
 **Institution:** Gettysburg College
 **Program:** Digital Technology Summer Fellowship (DTSF) 2025
 
+[![Watch the Demo](https://img.youtube.com/vi/YejNIvxSDlA/maxresdefault.jpg)](https://www.youtube.com/watch?v=YejNIvxSDlA)
+
+**[▶️ Watch the Full Demo Video](https://www.youtube.com/watch?v=YejNIvxSDlA)**
+
 ---
 
 ## Table of Contents
