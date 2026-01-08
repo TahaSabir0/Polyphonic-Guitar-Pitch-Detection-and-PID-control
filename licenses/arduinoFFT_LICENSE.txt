@@ -1,1 +1,0 @@
-License for arduinoFFT library – to be filled from upstream source.
