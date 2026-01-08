@@ -50,6 +50,8 @@ The audio detection system is the foundation of the project. It captures string 
 
 - **Microphone:** [Korg CM200BK](https://www.korg.com/us/products/tuners/cm_200/) clip-on contact microphone
 
+  - The reason for choosing this microphone is that it picks up vibrations directly from the guitar body, eliminating ambient noise. Inspired by [Antonio Hinojosa Cabrera's work](https://upcommons.upc.edu/entities/publication/d1f17706-ed6d-4329-bab4-19746a667733).
+
 - **Amplification Circuit:** Based on [Amanda Ghassaei's Arduino Audio Input circuit](https://www.instructables.com/Arduino-Audio-Input/)
   - Uses TL072CN operational amplifiers
   - All required components listed in Amanda's tutorial
